@@ -1,0 +1,19 @@
+Diagnostics:
+  ClangTidy:
+    Add: [
+      modernize*,
+      cppcoreguidelines*,
+      readability*,
+      performance*,
+      clang-analyzer*,
+      bug-prone*,
+      concurrency*,
+      portability*,
+      misc*,
+    ]
+    Remove: [
+      readability-identifier-length,
+      cppcoreguidelines-avoid-magic-numbers,
+      readability-magic-numbers,
+      modernize-raw-string-literal
+    ]

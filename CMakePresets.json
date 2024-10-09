@@ -1,0 +1,16 @@
+{
+	"version": 2,
+	"configurePresets": [
+		{
+			"name": "debug",
+			"displayName": "Debug",
+			"binaryDir": "${sourceDir}/build-debug",
+			"generator": "Ninja",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Debug",
+				"CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+				"CMAKE_CXX_FLAGS": "-std=c++2c -O3 -Wall -Wextra -Wpedantic -fdiagnostics-color=always"
+			}
+		}
+	]
+}
