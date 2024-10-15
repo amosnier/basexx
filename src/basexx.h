@@ -238,7 +238,22 @@ struct try_decode {
 	    -> std::expected<std::ranges::in_out_result<std::ranges::borrowed_iterator_t<R>, O>,
 			     decodexx_error_result<std::ranges::borrowed_iterator_t<R>, O>>
 	{
-		return (*this)(std::ranges::begin(r), std::ranges::end(r), std::move(result), std::move(proj));
+		return (*this)(std::ranges::begin(r), std::ranges::end(r), std::move(result), std::move(proj))
+		    .transform([](auto &&expected) {
+			    return std::ranges::in_out_result<std::ranges::borrowed_iterator_t<R>, O>{
+				.in{std::move(expected.in)},
+				.out{std::move(expected.out)},
+			    };
+		    })
+		    .transform_error([](auto &&error) {
+			    return decodexx_error_result<std::ranges::borrowed_iterator_t<R>, O>{
+				.in_out_result{
+				    .in{std::move(error.in_out_result.in)},
+				    .out{std::move(error.in_out_result.out)},
+				},
+				.error{error.error},
+			    };
+		    });
 	}
 };
 
@@ -275,13 +290,11 @@ struct try_decode_to<id, std::vector> {
 
 		std::vector<std::byte> v(*size);
 
-		const auto result = try_decode<id>{}(std::forward<R>(r), v.begin(), std::move(proj));
-
-		if (result.has_value()) {
-			v.resize(result->out - v.begin());
-		}
-
-		return result.transform([v = std::move(v)](auto &&) mutable { return std::move(v); })
+		return try_decode<id>{}(std::forward<R>(r), v.begin(), std::move(proj))
+		    .transform([v = std::move(v)](const auto &result) mutable {
+			    v.resize(result.out - v.begin());
+			    return std::move(v);
+		    })
 		    .transform_error([](const auto &error) { return error.error; });
 	}
 };

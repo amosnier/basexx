@@ -271,14 +271,8 @@ void test_decode64_input_range_error_handling()
 
 void test_encode64_decode64()
 {
-	// Note: the try_decode functions return updated input and output iterators when they are successful. If the
-	// passed range to decode is an automatic variable, the returned iterators would be dangling. In such a case,
-	// even if we use the decode functions, which throw away those iterators, the decoded expression is not a
-	// constant expression. In order to avoid that problem, we need to ensure that the encoded range still is in
-	// scope when the decoding function returns. Hence the somewhat verbose code below.
 	constexpr auto man = "\x{4D}\x{61}\x{6E}"sv;
-	constexpr auto encoded = man | to_bytes | encode64;
-	static_assert(equal(decode64_to_vector(encoded), man | to_bytes));
+	static_assert(equal(decode64_to_vector(man | to_bytes | encode64), man | to_bytes));
 }
 
 void test_decode64_encode64()
